@@ -1,0 +1,289 @@
+swagger: "2.0"
+info:
+  description: "App de serviços e delivery"
+  version: "1.0.0"
+  title: "Oxente Delivery"
+  termsOfService: "http://swagger.io/terms/"
+  contact:
+    email: "contato@oxentedelivery.com"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "Produtostore.swagger.io"
+basePath: "/v2"
+tags:
+- name: "Produto"
+  description: "Produtos disponíveis no aplicativo"
+  externalDocs:
+    description: "Find out more about our store"
+    url: "http://swagger.io"
+schemes:
+- "https"
+- "http"
+paths:
+  /Produto:
+    post:
+      tags:
+      - "Produto"
+      summary: "Adiciona um novo produto no aplicativo"
+      description: ""
+      operationId: "addProduto"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Produto que será adicionado no aplicativo"
+        required: true
+        schema:
+          $ref: "#/definitions/Produto"
+      responses:
+        "200":
+          description: "Operação realizada com sucesso"
+        "405":
+          description: "Entrada de dados de produto inválido"
+      security:
+      - Produtostore_auth:
+        - "write:Produtos"
+        - "read:Produtos"
+    put:
+      tags:
+      - "Produto"
+      summary: "Atualiza um produto existente"
+      description: ""
+      operationId: "updateProduto"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Produto object that needs to be added to the store"
+        required: true
+        schema:
+          $ref: "#/definitions/Produto"
+      responses:
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Produto not found"
+        "405":
+          description: "Validation exception"
+      security:
+      - Produtostore_auth:
+        - "write:Produtos"
+        - "read:Produtos"
+  /Produto/findByStatus:
+    get:
+      tags:
+      - "Produto"
+      summary: "Finds Produtos by status"
+      description: "Multiple status values can be provided with comma separated strings"
+      operationId: "findProdutosByStatus"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "status"
+        in: "query"
+        description: "Status values that need to be considered for filter"
+        required: true
+        type: "array"
+        items:
+          type: "string"
+          enum:
+          - "available"
+          - "pending"
+          - "sold"
+          default: "available"
+        collectionFormat: "multi"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Produto"
+        "400":
+          description: "Invalid status value"
+      security:
+      - Produtostore_auth:
+        - "write:Produtos"
+        - "read:Produtos"
+  /Produto/{ProdutoId}:
+    get:
+      tags:
+      - "Produto"
+      summary: "Find Produto by ID"
+      description: "Returns a single Produto"
+      operationId: "getProdutoById"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "ProdutoId"
+        in: "path"
+        description: "ID of Produto to return"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Produto"
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Produto not found"
+      security:
+      - api_key: []
+    post:
+      tags:
+      - "Produto"
+      summary: "Atualiza um produto"
+      description: ""
+      operationId: "updateProdutoWithForm"
+      consumes:
+      - "application/x-www-form-urlencoded"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "ProdutoId"
+        in: "path"
+        description: "Id do produto que será atualizado"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "name"
+        in: "formData"
+        description: "Atualiza o nome de um produto"
+        required: false
+        type: "string"
+      - name: "status"
+        in: "formData"
+        description: "Atualiza o status de um produto"
+        required: false
+        type: "string"
+      responses:
+        "405":
+          description: "Dados inválidos"
+      security:
+      - Produtostore_auth:
+        - "write:Produtos"
+        - "read:Produtos"
+    delete:
+      tags:
+      - "Produto"
+      summary: "Deleta um Produto"
+      description: ""
+      operationId: "deleteProduto"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "api_key"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "ProdutoId"
+        in: "path"
+        description: "Id do produto a ser deletado"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "400":
+          description: "ID inválido"
+        "404":
+          description: "Produto não encontrado"
+      security:
+      - Produtostore_auth:
+        - "write:Produtos"
+        - "read:Produtos"
+  /Produto/{ProdutoId}/uploadImage:
+    post:
+      tags:
+      - "Produto"
+      summary: "Faz o upload de uma imagem do produto"
+      description: ""
+      operationId: "uploadFile"
+      consumes:
+      - "multipart/form-data"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "ProdutoId"
+        in: "path"
+        description: "ID do produto a ser atualizado"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "additionalMetadata"
+        in: "formData"
+        description: "Additional data to pass to server"
+        required: false
+        type: "string"
+      - name: "file"
+        in: "formData"
+        description: "Arquivo a ser feito o upload"
+        required: false
+        type: "file"
+      responses:
+        "200":
+          description: "Sucesso ao realizar a operação"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+      security:
+      - Produtostore_auth:
+        - "write:Produtos"
+        - "read:Produtos"
+securityDefinitions:
+  Produtostore_auth:
+    type: "oauth2"
+    authorizationUrl: "http://Produtostore.swagger.io/oauth/dialog"
+    flow: "implicit"
+    scopes:
+      write:Produtos: "Modificar produtos"
+      read:Produtos: "Leitura dos produtos"
+  api_key:
+    type: "apiKey"
+    name: "api_key"
+    in: "header"
+definitions:
+  Produto:
+    type: "object"
+    required:
+    - "name"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      name:
+        type: "string"
+        example: "pizza"
+      price:
+        type: "number"
+        format: "double"
+        example: "20.00"
+  ApiResponse:
+    type: "object"
+    properties:
+      code:
+        type: "integer"
+        format: "int32"
+      type:
+        type: "string"
+      message:
+        type: "string"
+externalDocs:
+  description: "Find out more about Swagger"
+  url: "http://swagger.io"
